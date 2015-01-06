@@ -12,6 +12,7 @@ import java.lang.Exception;import java.lang.String;import java.lang.StringBuilde
 
 
 
+
 //import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.HttpResponse;
@@ -21,6 +22,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.entity.StringEntity;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.MutableDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -557,7 +559,7 @@ public class project {
            dictionary = builder.toString();
            int i = dictionary.indexOf(':');
            dictionary = dictionary.substring(i+1, dictionary.length()-1);
-           System.out.print(dictionary);
+           //System.out.print(dictionary);
          
            dict = new JSONObject(dictionary);
            
@@ -569,6 +571,136 @@ public class project {
          ex.printStackTrace();
        }
         return dict;
+	}
+	
+	public static void validatetime(String token, String time)
+	{
+		InputStream inputStream = null;
+        String result;
+        StringBuilder builder = new StringBuilder();
+        String valid = "";
+        try 
+        {    
+          // 1. create HttpClient
+           HttpClient httpclient = new DefaultHttpClient();
+
+           // 2. make POST request to the given URL
+           HttpPost httpPost = new HttpPost("http://challenge.code2040.org/api/validatetime");
+
+           String json = "";
+
+           // 3. build jsonObject
+           JSONObject jsonObject = new JSONObject();
+           jsonObject.accumulate("token", token);
+           jsonObject.accumulate("datestamp", time);
+
+           // 4. convert JSONObject to JSON to String
+           json = jsonObject.toString();
+
+           // ** Alternative way to convert Person object to JSON string usin Jackson Lib
+           // ObjectMapper mapper = new ObjectMapper();
+           // json = mapper.writeValueAsString(person);
+
+           // 5. set json to StringEntity
+           StringEntity se = new StringEntity(json);
+
+           // 6. set httpPost Entity
+           httpPost.setEntity(se);
+
+           // 7. Set some headers to inform server about the type of the content
+           httpPost.setHeader("Accept", "application/json");
+           httpPost.setHeader("Content-type", "application/json");
+
+
+           // 8. Execute POST request to the given URL
+           HttpResponse httpResponse = httpclient.execute(httpPost);
+
+           // 9. receive response as inputStream
+           inputStream = httpResponse.getEntity().getContent();
+
+           BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+           
+           //retrieves string from json response
+           while ((result = reader.readLine()) != null) {
+               builder.append(result);
+           }
+           //System.out.print(builder.toString());
+           valid = builder.toString();
+           //System.out.print(valid);
+
+       } catch (ClientProtocolException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       } catch (Exception ex) {
+         ex.printStackTrace();
+       }
+        
+	}
+	
+	public static void grade(String token)
+	{
+		InputStream inputStream = null;
+        String result;
+        StringBuilder builder = new StringBuilder();
+        String valid = "";
+        try 
+        {    
+          // 1. create HttpClient
+           HttpClient httpclient = new DefaultHttpClient();
+
+           // 2. make POST request to the given URL
+           HttpPost httpPost = new HttpPost("http://challenge.code2040.org/api/status");
+
+           String json = "";
+
+           // 3. build jsonObject
+           JSONObject jsonObject = new JSONObject();
+           jsonObject.accumulate("token", token);
+           
+
+           // 4. convert JSONObject to JSON to String
+           json = jsonObject.toString();
+
+           // ** Alternative way to convert Person object to JSON string usin Jackson Lib
+           // ObjectMapper mapper = new ObjectMapper();
+           // json = mapper.writeValueAsString(person);
+
+           // 5. set json to StringEntity
+           StringEntity se = new StringEntity(json);
+
+           // 6. set httpPost Entity
+           httpPost.setEntity(se);
+
+           // 7. Set some headers to inform server about the type of the content
+           httpPost.setHeader("Accept", "application/json");
+           httpPost.setHeader("Content-type", "application/json");
+
+
+           // 8. Execute POST request to the given URL
+           HttpResponse httpResponse = httpclient.execute(httpPost);
+
+           // 9. receive response as inputStream
+           inputStream = httpResponse.getEntity().getContent();
+
+           BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+           
+           //retrieves string from json response
+           while ((result = reader.readLine()) != null) {
+               builder.append(result);
+           }
+           //System.out.print(builder.toString());
+           valid = builder.toString();
+           System.out.print(valid);
+
+       } catch (ClientProtocolException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       } catch (Exception ex) {
+         ex.printStackTrace();
+       }
+        
 	}
 	
 	public static void main(String[] args) throws JSONException {
@@ -644,27 +776,31 @@ public class project {
         JSONObject dict4 = getTime(token);
         String datestamp = dict4.getString("datestamp");
         int interval = dict4.getInt("interval");
-        
+        /*
         int sec = interval%60;
         int min = (interval/60)%60;
         int hr = (interval/3600)%24;
         int day = (interval/86400)%365;
         int year = (interval/315360000);
-        
-        MutableDateTime datetime = new MutableDateTime(datestamp);
+        */
+        DateTime datetime = new DateTime(datestamp).withZone(DateTimeZone.UTC);
+        /*
         datetime.addSeconds(sec);
         datetime.addMinutes(min);
         datetime.addHours(hr);
         datetime.addDays(day);
         datetime.addYears(year);
+        */
+        //System.out.print(year + "\n"+ day + "\n" + hr + "\n" + min + "\n" + sec);
         
-        System.out.print(year + "\n"+ day + "\n" + hr + "\n" + min + "\n" + sec);
-        
+        datetime = datetime.plusSeconds(interval);
         
         String newdate = datetime.toString(); 
-        System.out.print("\n" + newdate);
         
+        validatetime(token, newdate);
         
+        grade(token);
+               
 	}
 
 }
