@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="/home/marvin/workspace/Code2040/mylib/httpcore-4.3.3.jar"/>
 	<classpathentry kind="lib" path="/home/marvin/workspace/Code2040/mylib/httpmime-4.3.6.jar"/>
 	<classpathentry kind="lib" path="/home/marvin/workspace/Code2040/mylib/org.json-20120521.jar"/>
+	<classpathentry kind="lib" path="/home/marvin/workspace/Code2040/mylib/joda-time-2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
